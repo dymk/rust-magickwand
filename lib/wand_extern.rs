@@ -4,6 +4,7 @@
 
 mod types;
 
+//You'll probably need to change this for linux/OSX.
 #[link_name = "CORE_DB_wand_"]
 #[link_args = "-LG:\\Programs\\ImageMagick-6.8.4\\VisualMagick\\lib"]
 pub extern mod wand {
@@ -32,7 +33,7 @@ pub extern mod wand {
 	  wand: types::MagickWandPtr,
 	  cols: libc::size_t,
 	  rows: libc::size_t,
-	  filter: super::types::FilterTypes,
+	  filter: types::FilterTypes,
 	  blur: libc::c_double) -> bool;
 
 	//Read/write functions

@@ -24,7 +24,7 @@ fn test_wand_genesis() {
 fn test_magick_read_image() {
 	unsafe {
 		let wand = wand_extern::wand::NewMagickWand();
-		let path_bytes = str::to_bytes("../test/small_bmp.bmp");
+		let path_bytes = str::to_bytes("../test/read/small_bmp.bmp");
 		let raw_path_bytes = vec::raw::to_ptr(path_bytes);
 		assert!(wand_extern::wand::MagickReadImage(wand, raw_path_bytes as *libc::c_char) == true);
 		assert!(wand_extern::wand::MagickIdentifyImage(wand) != ptr::null());
@@ -38,7 +38,7 @@ fn test_adaptive_resize_image() {
 		assert!(
 		wand_extern::wand::MagickReadImage(
 			wand,
-			vec::raw::to_ptr(str::to_bytes("../test/small_bmp.bmp")) as *i8
+			vec::raw::to_ptr(str::to_bytes("../test/read/small_bmp.bmp")) as *i8
 		) == true);
 		assert!(wand_extern::wand::MagickAdaptiveResizeImage(wand, 10, 10) == true);
 	}
@@ -70,7 +70,7 @@ fn test_identify_image() {
 
 	unsafe {
 		let wand = wand_extern::wand::NewMagickWand();
-		let image_bytes = helper::get_file_bytes("../test/small_bmp.bmp");
+		let image_bytes = helper::get_file_bytes("../test/read/small_bmp.bmp");
 		wand_extern::wand::MagickReadImageBlob(wand, vec::raw::to_ptr(image_bytes), image_bytes.len() as u32);
 		let attrs = wand_extern::wand::MagickIdentifyImage(wand);
 		assert!(attrs != ptr::null());
@@ -83,7 +83,7 @@ fn test_identify_image() {
 fn test_relinquish_memory() {
 	unsafe {
 		let wand = wand_extern::wand::NewMagickWand();
-		let image_bytes = helper::get_file_bytes("../test/small_bmp.bmp");
+		let image_bytes = helper::get_file_bytes("../test/read/small_bmp.bmp");
 		wand_extern::wand::MagickReadImageBlob(wand, vec::raw::to_ptr(image_bytes), image_bytes.len() as u32);
 		let attrs = wand_extern::wand::MagickIdentifyImage(wand);
 		wand_extern::wand::MagickRelinquishMemory(attrs as *libc::c_void);
@@ -94,7 +94,7 @@ fn test_relinquish_memory() {
 
 #[test]
 fn test_magick_get_image_blob() {
-	let image_bytes = helper::get_file_bytes("../test/small_bmp.bmp");
+	let image_bytes = helper::get_file_bytes("../test/read/small_bmp.bmp");
 	unsafe {
 		//Test without a blob in the wand
 		let wand = wand_extern::wand::NewMagickWand();
@@ -121,7 +121,7 @@ fn test_magick_get_image_blob() {
 #[test]
 fn test_magick_read_image_blob() {
 
-	let image_bytes = helper::get_file_bytes("../test/small_bmp.bmp");
+	let image_bytes = helper::get_file_bytes("../test/read/small_bmp.bmp");
 	unsafe {
 		let wand = wand_extern::wand::NewMagickWand();
 		let res = wand_extern::wand::MagickReadImageBlob(wand, vec::raw::to_ptr(image_bytes), image_bytes.len() as u32);
