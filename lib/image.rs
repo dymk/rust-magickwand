@@ -1,12 +1,12 @@
 //Bug prevents 'use' in this case when compiling a test
-mod c_types;
+mod types;
 
 pub struct Image {
-	priv img_ptr: c_types::ImagePtr
+	priv img_ptr: types::ImagePtr
 }
 
 pub impl Image {
-	fn new(i: c_types::ImagePtr) -> Image {
+	fn new(i: types::ImagePtr) -> Image {
 		Image { img_ptr: i }
 	}
 }

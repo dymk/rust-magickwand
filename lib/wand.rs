@@ -1,9 +1,9 @@
-mod c_types;
+mod types;
 mod image;
 mod wand_extern;
 
 pub struct MagickWand {
-	priv wand_ptr: c_types::MagickWandPtr
+	priv wand_ptr: types::MagickWandPtr
 }
 
 pub impl MagickWand {
