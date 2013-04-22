@@ -24,12 +24,30 @@ pub extern mod wand {
 
 	//Image manipulation functions
 	fn MagickSetImageFormat(wand: types::MagickWandPtr, format: *libc::c_char) -> bool;
-	fn MagickAdaptiveResizeImage(wand: types::MagickWandPtr, cols: libc::size_t, rows: libc::size_t) -> bool;
+	fn MagickAdaptiveResizeImage(
+	  wand: types::MagickWandPtr,
+	  cols: libc::size_t,
+	  rows: libc::size_t) -> bool;
+	fn MagickResizeImage(
+	  wand: types::MagickWandPtr,
+	  cols: libc::size_t,
+	  rows: libc::size_t,
+	  filter: super::types::FilterTypes,
+	  blur: libc::c_double) -> bool;
 
 	//Read/write functions
 	// MagickReadImageFile
-	fn MagickReadImageBlob(wand: types::MagickWandPtr, blob: *libc::c_uchar, length: libc::size_t) -> bool; //Tested
-	fn MagickReadImage(wand: types::MagickWandPtr, fname: *libc::c_char) -> bool; //Tested
-	fn MagickGetImageBlob(wand: types::MagickWandPtr, length: *libc::size_t) -> *libc::c_void; //Tested
-	fn MagickWriteImage(wand: types::MagickWandPtr, fname: *libc::c_char) -> bool;
+	fn MagickReadImageBlob(
+	  wand: types::MagickWandPtr,
+	  blob: *libc::c_uchar,
+	  length: libc::size_t) -> bool; //Tested
+	fn MagickReadImage(
+	  wand: types::MagickWandPtr,
+	  fname: *libc::c_char) -> bool; //Tested
+	fn MagickGetImageBlob(
+	  wand: types::MagickWandPtr,
+	  length: *libc::size_t) -> *libc::c_void; //Tested
+	fn MagickWriteImage(
+	  wand: types::MagickWandPtr,
+	  fname: *libc::c_char) -> bool;
 }

@@ -1,4 +1,4 @@
-mod types;
+pub mod types;
 mod image;
 mod wand_extern;
 
@@ -36,7 +36,12 @@ pub impl MagickWand {
 		}
 	}
 	fn readImageBlob(&self, blob: &[u8]) -> bool {
-		unsafe { wand_extern::wand::MagickReadImageBlob(self.wand_ptr, vec::raw::to_ptr(blob), blob.len() as u32) }
+		unsafe {
+			wand_extern::wand::MagickReadImageBlob(
+			  self.wand_ptr,
+			  vec::raw::to_ptr(blob),
+			  blob.len() as u32)
+		}
 	}
 	fn getImageBlob(&self) -> ~[u8] {
 		let mut len: u32 = 0;
@@ -45,6 +50,21 @@ pub impl MagickWand {
 			let v: ~[u8] = vec::from_buf(blob as *u8, len as uint);
 			wand_extern::wand::MagickRelinquishMemory(blob);
 			return v;
+		}
+	}
+	fn resizeImage(
+	  &self,
+	  cols: u32,
+	  rows: u32,
+	  filter: types::FilterTypes,
+	  blur: f64) -> bool {
+		unsafe {
+			wand_extern::wand::MagickResizeImage(
+			  self.wand_ptr,
+			  cols,
+			  rows,
+			  filter,
+			  blur)
 		}
 	}
 }
