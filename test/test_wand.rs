@@ -1,8 +1,8 @@
-#[path = "../lib/wand.rs"]
+#[path = "../src/wand.rs"]
 mod wand;
-#[path = "../lib/pixel.rs"]
+#[path = "../src/pixel.rs"]
 mod pixel;
-#[path = "../lib/types.rs"]
+#[path = "../src/types.rs"]
 mod types;
 mod helper;
 

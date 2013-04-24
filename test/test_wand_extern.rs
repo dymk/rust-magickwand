@@ -1,8 +1,8 @@
 // use wand_extern::wand;
 
-#[path = "../lib/types.rs"]
+#[path = "../src/types.rs"]
 mod types;
-#[path = "../lib/wand_extern.rs"]
+#[path = "../src/wand_extern.rs"]
 mod wand_extern;
 mod helper;
 #[test]
