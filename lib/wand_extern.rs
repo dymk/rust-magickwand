@@ -1,7 +1,7 @@
 /*
  * Definitions for the C interface of Magick Wand
  */
-
+use types::{FilterTypes, StorageType};
 mod types;
 
 //You'll probably need to change this for linux/OSX.
@@ -33,7 +33,7 @@ pub extern mod wand {
 	  wand: types::MagickWandPtr,
 	  cols: libc::size_t,
 	  rows: libc::size_t,
-	  filter: super::types::FilterTypes,
+	  filter: FilterTypes,
 	  blur: libc::c_double) -> bool;
 	fn MagickGetImageWidth(wand: types::MagickWandPtr) -> libc::size_t;
 	fn MagickGetImageHeight(wand: types::MagickWandPtr) -> libc::size_t;
@@ -44,7 +44,7 @@ pub extern mod wand {
 	  cols: libc::size_t,
 	  rows: libc::size_t,
 	  map: *libc::c_char,
-	  storage: super::types::StorageType,
+	  storage: StorageType,
 	  pix_buff: *libc::c_void) -> bool;
 
 	//Read/write file functions

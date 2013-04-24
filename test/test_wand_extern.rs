@@ -1,9 +1,10 @@
 // use wand_extern::wand;
 
+#[path = "../lib/types.rs"]
+mod types;
 #[path = "../lib/wand_extern.rs"]
 mod wand_extern;
 mod helper;
-
 #[test]
 fn test_wand_genesis() {
 	unsafe {
@@ -89,8 +90,6 @@ fn test_relinquish_memory() {
 		wand_extern::wand::MagickRelinquishMemory(attrs as *libc::c_void);
 	}
 }
-
-#[test]
 
 #[test]
 fn test_magick_get_image_blob() {
