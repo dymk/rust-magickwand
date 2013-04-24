@@ -66,3 +66,55 @@ fn test_resize_write_image() {
 	assert!(wand.resizeImage(100, 50, wand::types::LanczosFilter, 1.0));
 	assert!(wand.writeImage("../test/written/small_bmp_resize.bmp"));
 }
+
+#[test]
+fn test_image_width() {
+	let wand = wand::MagickWand::new();
+	wand.readImage("../test/read/white_line_10px_bmp.bmp");
+	assert!(wand.imageWidth() == 10);
+}
+
+#[test]
+fn test_image_height() {
+	let wand = wand::MagickWand::new();
+	wand.readImage("../test/read/white_line_10px_bmp.bmp");
+	assert!(wand.imageHeight() == 1);
+}
+
+#[test]
+fn test_export_image_pixels() {
+	let wand = wand::MagickWand::new();
+	wand.readImage("../test/read/white_line_10px_bmp.bmp");
+	let pixels = match wand.exportPixels() {
+		Some(pixels) => pixels,
+		None         => fail!(~"Export failed")
+	};
+
+	assert!(pixels.len() == 10);
+	for pixels.each |&px| {
+		assert!(px == wand::RGB(255, 255, 255));
+	}
+
+	let wand = wand::MagickWand::new();
+	wand.readImage("../test/read/rgb_line_3px_bmp.bmp");
+	let pixels = match wand.exportPixels() {
+		Some(pixels) => pixels,
+		None         => fail!(~"Export failed")
+	};
+
+	let r = pixels[0];
+	let g = pixels[1];
+	let b = pixels[2];
+	assert!(r == wand::RGB(255, 0, 0));
+	assert!(g == wand::RGB(0, 255, 0));
+	assert!(b == wand::RGB(0, 0, 255));
+}
+
+#[test]
+fn test_export_image_pixels_without_image() {
+	let wand = wand::MagickWand::new();
+	match wand.exportPixels() {
+		Some(pixels) => fail!(~"Pixels not expected"),
+		None         => assert!(true)
+	}
+}
