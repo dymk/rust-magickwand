@@ -120,6 +120,15 @@ pub impl MagickWand {
 	fn numberImages(&self) -> u32 {
 		unsafe { wand_extern::wand::MagickGetNumberImages(self.wand_ptr) }
 	}
+	fn imageTotalInkDensity(&self) -> f64 {
+		unsafe { wand_extern::wand::MagickGetImageTotalInkDensity(self.wand_ptr) }
+	}
+	fn hasNextImage(&self) -> bool {
+		unsafe { wand_extern::wand::MagickHasNextImage(self.wand_ptr) }
+	}
+	fn hasPreviousImage(&self) -> bool {
+		unsafe { wand_extern::wand::MagickHasNextImage(self.wand_ptr) }
+	}
 }
 
 impl Clone for MagickWand {

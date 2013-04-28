@@ -1,7 +1,7 @@
 /*
  * Definitions for the C interface of Magick Wand
  */
-use types::{FilterTypes, StorageType};
+use types::{FilterTypes, StorageType, MagickWandPtr};
 mod types;
 
 //You'll probably need to change this for linux/OSX.
@@ -12,36 +12,39 @@ pub extern mod wand {
 	fn MagickWandGenesis();  //Tested
 	fn MagickWandTerminus(); //Tested
 
-	fn NewMagickWand() -> types::MagickWandPtr; //Tested
+	fn NewMagickWand() -> MagickWandPtr; //Tested
 	// fn NewPixelWand() -> *PixelWand;
 	// fn NewPixelWands(number_wands: libc::size_t) -> **PixelWand;
 
-	fn DestroyMagickWand(wand: types::MagickWandPtr) -> types::MagickWandPtr; //Tested
-	fn ClearMagickWand(wand: types::MagickWandPtr); //Tested
-	fn CloneMagickWand(wand: types::MagickWandPtr) -> types::MagickWandPtr; //Tested
+	fn DestroyMagickWand(wand: MagickWandPtr) -> MagickWandPtr; //Tested
+	fn ClearMagickWand(wand: MagickWandPtr); //Tested
+	fn CloneMagickWand(wand: MagickWandPtr) -> MagickWandPtr; //Tested
 	fn MagickRelinquishMemory(resource: *libc::c_void) -> *libc::c_void; //Tested
-	fn MagickIdentifyImage(wand: types::MagickWandPtr) -> *libc::c_char; //Tested
-	fn MagickResetIterator(wand: types::MagickWandPtr); //Tested
-	fn IsMagickWand(wand: types::MagickWandPtr) -> bool; //Tested
+	fn MagickIdentifyImage(wand: MagickWandPtr) -> *libc::c_char; //Tested
+	fn MagickResetIterator(wand: MagickWandPtr); //Tested
+	fn IsMagickWand(wand: MagickWandPtr) -> bool; //Tested
 
-	fn MagickGetNumberImages(wand: types::MagickWandPtr) -> libc::size_t; //Tested
+	fn MagickGetNumberImages(wand: MagickWandPtr) -> libc::size_t; //Tested
+	fn MagickGetImageTotalInkDensity(wand: MagickWandPtr) -> libc::c_double;
+	fn MagickHasNextImage(wand: MagickWandPtr) -> bool;
+	fn MagickHasPreviousImage(wand: MagickWandPtr) -> bool;
 
 	//Image manipulation functions
-	fn MagickSetImageFormat(wand: types::MagickWandPtr, format: *libc::c_char) -> bool;
+	fn MagickSetImageFormat(wand: MagickWandPtr, format: *libc::c_char) -> bool;
 	fn MagickAdaptiveResizeImage(
-	  wand: types::MagickWandPtr,
+	  wand: MagickWandPtr,
 	  cols: libc::size_t,
 	  rows: libc::size_t) -> bool;
 	fn MagickResizeImage(
-	  wand: types::MagickWandPtr,
+	  wand: MagickWandPtr,
 	  cols: libc::size_t,
 	  rows: libc::size_t,
 	  filter: FilterTypes,
 	  blur: libc::c_double) -> bool;
-	fn MagickGetImageWidth(wand: types::MagickWandPtr) -> libc::size_t;
-	fn MagickGetImageHeight(wand: types::MagickWandPtr) -> libc::size_t;
+	fn MagickGetImageWidth(wand: MagickWandPtr) -> libc::size_t;
+	fn MagickGetImageHeight(wand: MagickWandPtr) -> libc::size_t;
 	fn MagickExportImagePixels(
-	  wand: types::MagickWandPtr,
+	  wand: MagickWandPtr,
 	  x: libc::size_t,
 	  y: libc::size_t,
 	  cols: libc::size_t,
@@ -49,20 +52,30 @@ pub extern mod wand {
 	  map: *libc::c_char,
 	  storage: StorageType,
 	  pix_buff: *libc::c_void) -> bool;
+	fn MagickImportImagePixels(
+	  wand: MagickWandPtr,
+	  x: libc::size_t,
+	  y: libc::size_t,
+	  cols: libc::size_t,
+	  rows: libc::size_t,
+	  map: *libc::c_char,
+	  storage: StorageType,
+	  pix_buff: *libc::c_void) -> bool;
+	)
 
 	//Read/write file functions
 	// MagickReadImageFile
 	fn MagickReadImageBlob(
-	  wand: types::MagickWandPtr,
+	  wand: MagickWandPtr,
 	  blob: *libc::c_uchar,
 	  length: libc::size_t) -> bool; //Tested
 	fn MagickReadImage(
-	  wand: types::MagickWandPtr,
+	  wand: MagickWandPtr,
 	  fname: *libc::c_char) -> bool; //Tested
 	fn MagickGetImageBlob(
-	  wand: types::MagickWandPtr,
+	  wand: MagickWandPtr,
 	  length: *libc::size_t) -> *libc::c_void; //Tested
 	fn MagickWriteImage(
-	  wand: types::MagickWandPtr,
+	  wand: MagickWandPtr,
 	  fname: *libc::c_char) -> bool;
 }
