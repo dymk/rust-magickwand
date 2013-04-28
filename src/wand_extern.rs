@@ -18,10 +18,13 @@ pub extern mod wand {
 
 	fn DestroyMagickWand(wand: types::MagickWandPtr) -> types::MagickWandPtr; //Tested
 	fn ClearMagickWand(wand: types::MagickWandPtr); //Tested
+	fn CloneMagickWand(wand: types::MagickWandPtr) -> types::MagickWandPtr; //Tested
 	fn MagickRelinquishMemory(resource: *libc::c_void) -> *libc::c_void; //Tested
 	fn MagickIdentifyImage(wand: types::MagickWandPtr) -> *libc::c_char; //Tested
 	fn MagickResetIterator(wand: types::MagickWandPtr); //Tested
 	fn IsMagickWand(wand: types::MagickWandPtr) -> bool; //Tested
+
+	fn MagickGetNumberImages(wand: types::MagickWandPtr) -> libc::size_t; //Tested
 
 	//Image manipulation functions
 	fn MagickSetImageFormat(wand: types::MagickWandPtr, format: *libc::c_char) -> bool;

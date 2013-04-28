@@ -9,8 +9,14 @@ pub struct MagickWand {
 
 pub impl MagickWand {
 	fn new() -> MagickWand {
-		unsafe { MagickWand {wand_ptr: wand_extern::wand::NewMagickWand()} }
+		let ptr;
+		unsafe { ptr = wand_extern::wand::NewMagickWand() }
+		MagickWand::new_with_ptr(ptr)
 	}
+	priv fn new_with_ptr(ptr: types::MagickWandPtr) -> MagickWand {
+		MagickWand { wand_ptr: ptr }
+	}
+
 	fn isMagickWand(&self) -> bool {
 		unsafe { wand_extern::wand::IsMagickWand(self.wand_ptr) }
 	}
@@ -86,10 +92,9 @@ pub impl MagickWand {
 		let height = self.imageHeight();
 		let num_pixels = (width * height) as uint;
 		let mut pixel_buffer = vec::with_capacity::<pixel::RGB>(num_pixels);
-		let mut success: bool;
 		unsafe {
 			let buffer_ptr = vec::raw::to_ptr(pixel_buffer);
-			success = wand_extern::wand::MagickExportImagePixels(
+			let success = wand_extern::wand::MagickExportImagePixels(
 			  self.wand_ptr,
 			  0,
 			  0,
@@ -110,6 +115,20 @@ pub impl MagickWand {
 				None
 			}
 		}
+	}
+
+	fn numberImages(&self) -> u32 {
+		unsafe { wand_extern::wand::MagickGetNumberImages(self.wand_ptr) }
+	}
+}
+
+impl Clone for MagickWand {
+	fn clone(&self) -> MagickWand {
+		let new_wand_ptr;
+		unsafe {
+			new_wand_ptr = wand_extern::wand::CloneMagickWand(self.wand_ptr)
+		}
+		MagickWand::new_with_ptr(new_wand_ptr)
 	}
 }
 

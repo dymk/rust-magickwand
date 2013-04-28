@@ -8,6 +8,23 @@ fn test_new_wand() {
 }
 
 #[test]
+fn test_clone_wand() {
+	let wand = wand::MagickWand::new();
+	assert!(wand.readImage("test/read/small_bmp.bmp"));
+	let second_wand = wand.clone();
+	wand.clear();
+	assert!(second_wand.numberImages() == 1);
+}
+
+#[test]
+fn test_get_num_images() {
+	let wand = wand::MagickWand::new();
+	assert!(wand.numberImages() == 0);
+	assert!(wand.readImage("test/read/small_bmp.bmp"));
+	assert!(wand.numberImages() == 1);
+}
+
+#[test]
 fn test_isMagickWand() {
 	let wand = wand::MagickWand::new();
 	assert!(wand.isMagickWand());
