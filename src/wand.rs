@@ -1,10 +1,7 @@
-use types::FilterTypes;
-use pixel::{FromRGBData, RGB};
-
-mod types;
-mod image;
-mod wand_extern;
-mod pixel;
+use types;
+use wand_extern;
+use types;
+use pixel;
 
 pub struct MagickWand {
 	priv wand_ptr: types::MagickWandPtr
@@ -60,7 +57,7 @@ pub impl MagickWand {
 	  &self,
 	  cols: u32,
 	  rows: u32,
-	  filter: FilterTypes,
+	  filter: types::FilterTypes,
 	  blur: f64) -> bool {
 		unsafe {
 			wand_extern::wand::MagickResizeImage(
@@ -82,13 +79,13 @@ pub impl MagickWand {
 		}
 	}
 
-	fn exportPixels<T : FromRGBData>(&self) -> Option<~[T]> {
+	fn exportPixels<T : pixel::FromRGBData>(&self) -> Option<~[T]> {
 
 		//Determine the size of the vector we need to allocate
 		let width = self.imageWidth();
 		let height = self.imageHeight();
 		let num_pixels = (width * height) as uint;
-		let mut pixel_buffer = vec::with_capacity::<RGB>(num_pixels);
+		let mut pixel_buffer = vec::with_capacity::<pixel::RGB>(num_pixels);
 		let mut success: bool;
 		unsafe {
 			let buffer_ptr = vec::raw::to_ptr(pixel_buffer);
@@ -102,10 +99,10 @@ pub impl MagickWand {
 			  super::types::CharPixel,
 			  buffer_ptr as *libc::c_void);
 			if success {
-				vec::raw::set_len::<RGB>(&mut pixel_buffer, num_pixels);
+				vec::raw::set_len::<pixel::RGB>(&mut pixel_buffer, num_pixels);
 
 				let pixel_buffer: ~[T] = do vec::map_consume(pixel_buffer) |p| {
-					FromRGBData::fromRGBData(p)
+					pixel::FromRGBData::fromRGBData(p)
 				};
 
 				Some(pixel_buffer)

@@ -1,3 +1,5 @@
 *.exe
 *.dll
 test/written/*
+*.sublime-project
+*.sublime-workspace

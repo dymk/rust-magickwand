@@ -1,19 +1,16 @@
 #[ crate_type = "lib" ];
 #[ link(name = "magick_wand",
-	      vers = "0.0.1")];
+	      vers = "0.0.1",
+	      uuid = "bedfd060-afb0-11e2-9e96-0800200c9a66",
+	      url  = "https://github.com/dymk/rust-magickwand")];
 
+#[not(test)]
 pub mod wand;
+pub mod types;
+pub mod pixel;
+pub mod image;
+pub mod wand_extern;
 
-/*
- * This also can't be exported yet due to issue 5951
- */
-// pub mod wand_extern;
-
-/*
- * For testing, see test_magick_wand.rs,
- * which is a file used to workaround issue
- * https://github.com/mozilla/rust/issues/5951
- */
-/*
- * mod test_magick_wand;
- */
+#[path="../test/test_all.rs"]
+#[test]
+mod test_all;
