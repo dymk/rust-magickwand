@@ -102,7 +102,7 @@ fn test_image_height() {
 fn test_export_image_pixels() {
 	let wand = wand::MagickWand::new();
 	assert!(wand.read_image("test/read/white_line_10px_bmp.bmp"));
-	let pixels = match wand.export_pixels::<pixel::RGB>() {
+	let pixels = match wand.export_pixels::<pixel::RGB>(None) {
 		Some(pixels) => pixels,
 		None         => fail!(~"Export failed")
 	};
@@ -115,7 +115,7 @@ fn test_export_image_pixels() {
 
 	let wand = wand::MagickWand::new();
 	assert!(wand.read_image("test/read/rgb_line_3px_bmp.bmp"));
-	let pixels = match wand.export_pixels::<pixel::RGB>() {
+	let pixels = match wand.export_pixels::<pixel::RGB>(None) {
 		Some(pixels) => pixels,
 		None         => fail!(~"Export failed")
 	};
@@ -132,7 +132,7 @@ fn test_export_image_pixels() {
 #[test]
 fn test_export_image_pixels_without_image() {
 	let wand = wand::MagickWand::new();
-	match wand.export_pixels::<pixel::RGB>() {
+	match wand.export_pixels::<pixel::RGB>(None) {
 		Some(_) => fail!(~"Pixels not expected"),
 		None    => assert!(true)
 	}
@@ -142,7 +142,7 @@ fn test_export_image_pixels_without_image() {
 fn test_export_image_pixels_yiq() {
 	let wand = wand::MagickWand::new();
 	assert!(wand.read_image("test/read/white_line_10px_bmp.bmp"));
-	let pixels = match wand.export_pixels::<pixel::YIQ>() {
+	let pixels = match wand.export_pixels::<pixel::YIQ>(None) {
 		Some(pixels) => pixels,
 		None         => fail!(~"Should have found pixels")
 	};
@@ -155,7 +155,7 @@ fn test_export_image_pixels_yiq() {
 fn test_export_pixels_flat() {
 	let wand = wand::MagickWand::new();
 	assert!(wand.read_image("test/read/white_line_10px_bmp.bmp"));
-	let flat_pixels = match wand.export_pixels_flat::<pixel::RGB>() {
+	let flat_pixels = match wand.export_pixels_flat::<pixel::RGB>(None) {
 		Some(p) => p,
 		None    => fail!(~"Should have found pixels")
 	};
@@ -171,9 +171,9 @@ fn test_import_pixels_flat() {
 	//White line
 	let pixels = vec::from_elem(10, pixel::RGB(255, 255, 255));
 	assert!(wand.new_image(10, 1, None));
-	assert!(wand.import_pixels_flat(10, 1, pixels));
+	assert!(wand.import_pixels_flat(pixels, Some((0, 0, 10, 1))));
 
-	let ex_pixel = match wand.export_pixels_flat::<pixel::RGB>() {
+	let ex_pixel = match wand.export_pixels_flat::<pixel::RGB>(None) {
 		Some(p) => p,
 		None    => fail!(~"expected pixels")
 	};
@@ -190,9 +190,9 @@ fn test_import_pixels() {
 		vec::from_elem(5, pixel::RGB(255, 255, 255))
 	});
 	assert!(wand.new_image(5, 5, None));
-	assert!(wand.import_pixels(pixels));
+	assert!(wand.import_pixels(pixels, None));
 
-	let ex_pixel = match wand.export_pixels_flat::<pixel::RGB>() {
+	let ex_pixel = match wand.export_pixels_flat::<pixel::RGB>(None) {
 		Some(p) => p,
 		None    => fail!(~"expected pixels")
 	};
@@ -205,11 +205,16 @@ fn test_import_pixels() {
 fn test_new_image_default_pixels() {
 	let wand = wand::MagickWand::new();
 	assert!(wand.new_image(10, 10, None));
-	let px = match wand.export_pixels_flat::<pixel::RGB>() {
+	let px = match wand.export_pixels_flat::<pixel::RGB>(None) {
 		Some(p) => p,
 		None    => fail!(~"expected pixels")
 	};
 	for px.each |p| {
 		assert!(*p == pixel::RGB(0, 0, 0));
 	}
+}
+
+#[test]
+fn test_new_image_write() {
+
 }

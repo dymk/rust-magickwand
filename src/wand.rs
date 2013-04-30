@@ -86,20 +86,47 @@ pub impl MagickWand {
 		}
 	}
 
-	fn export_pixels_flat<T: pixel::FromRGB + Copy>(&self) -> Option<~[T]> {
+	priv fn bounds_for_image(
+		  &self,
+	    bounds: Option<(uint, uint, uint, uint)>) -> (uint, uint, uint, uint) {
+		match bounds {
+			Some(b) => b,
+			None    => (0, 0, self.image_width(), self.image_height())
+		}
+	}
+
+	priv fn offset_for_image(
+		&self,
+		offset: Option<(uint, uint)>) -> (uint, uint) {
+		match offset {
+			Some(o) => o,
+			None    => (0, 0)
+		}
+	}
+
+	fn export_pixels_flat<T: pixel::FromRGB + Copy>(
+		  &self,
+		  bounds: Option<(uint, uint, uint, uint)>) -> Option<~[T]> {
 		let width = self.image_width();
 		let height = self.image_height();
-		let num_pixels = (width * height);
+
+		let bounds = self.bounds_for_image(bounds);
+		let (left, top, cols, rows) = bounds;
+
+		assert!(left + cols <= width);
+		assert!(top  + rows <= height);
+
+		let num_pixels = (cols * rows);
 		let mut pixel_buffer = vec::with_capacity::<pixel::RGB>(num_pixels);
 
 		unsafe {
 			let buffer_ptr = vec::raw::to_ptr(pixel_buffer);
 			let success = wand_extern::wand::MagickExportImagePixels(
 			  self.wand_ptr,
-			  0,
-			  0,
-			  width as u32,
-			  height as u32,
+			  left  as libc::size_t,
+			  top   as libc::size_t,
+			  cols  as libc::size_t,
+			  rows  as libc::size_t,
 			  vec::raw::to_ptr(str::to_bytes("RGB")) as *i8,
 			  types::CharPixel,
 			  buffer_ptr as *libc::c_void);
@@ -118,21 +145,22 @@ pub impl MagickWand {
 		}
 	}
 
-	fn export_pixels<T : pixel::FromRGB + Copy>(&self) -> Option<~[~[T]]> {
+	fn export_pixels<T : pixel::FromRGB + Copy>(
+	    &self,
+	    bounds: Option<(uint, uint, uint, uint)>) -> Option<~[~[T]]> {
 
-		//Determine the size of the vector we need to allocate
-		let width = self.image_width();
-		let height = self.image_height();
+		let bounds = self.bounds_for_image(bounds);
+		let (_left, _top, cols, rows) = bounds;
 
-		let flat_pixels  = match self.export_pixels_flat() {
+		let flat_pixels  = match self.export_pixels_flat(Some(bounds)) {
 			Some(p) => p,
 			None    => return None
 		};
 
 		//Make it a nested array of pixels
-		let mut mapped_pixel_buffer = vec::with_capacity::<~[T]>(height);
-		for uint::range(0, height) |h| {
-			let row = flat_pixels.slice(h * width, (h+1) * width).to_owned();
+		let mut mapped_pixel_buffer = vec::with_capacity::<~[T]>(rows);
+		for uint::range(0, rows) |h| {
+			let row = flat_pixels.slice(h * cols, (h+1) * cols).to_owned();
 			mapped_pixel_buffer.push(row);
 		}
 		Some(mapped_pixel_buffer)
@@ -140,10 +168,18 @@ pub impl MagickWand {
 
 	fn import_pixels_flat<T : pixel::ToRGB>(
 	    &self,
-	    width: uint,
-	    height: uint,
-	    pixel_buffer: &[T]) -> bool {
-		assert!(width * height == pixel_buffer.len());
+	    pixel_buffer: &[T],
+	    offset: Option<(uint, uint, uint, uint)>) -> bool {
+		let width = self.image_width();
+		let height = self.image_height();
+
+		let offset = self.bounds_for_image(offset);
+		let (left, top, cols, rows) = offset;
+
+		assert!(left+cols <= width);
+		assert!(top+rows <= height);
+
+		assert!(cols * rows == pixel_buffer.len());
 
 		let rgb_pixel_buffer = pixel_buffer.map(|p| {
 			p.to_rgb()
@@ -154,7 +190,10 @@ pub impl MagickWand {
 			let rgb_buffer_ptr = vec::raw::to_ptr(rgb_pixel_buffer);
 			success = wand_extern::wand::MagickImportImagePixels(
 			  self.wand_ptr,
-			  0, 0, width as u32, height as u32,
+			  left as libc::size_t,
+			  top  as libc::size_t,
+			  cols as libc::size_t,
+			  rows as libc::size_t,
 			  vec::raw::to_ptr(str::to_bytes("RGB")) as *i8,
 			  types::CharPixel,
 			  rgb_buffer_ptr as *libc::c_void);
@@ -165,11 +204,26 @@ pub impl MagickWand {
 
 	fn import_pixels<T : pixel::ToRGB + Copy>(
 	    &self,
-	    pixel_buffer: &[~[T]]) -> bool {
-		let height = pixel_buffer.len();
+	    pixel_buffer: &[~[T]],
+	    offset: Option<(uint, uint)>) -> bool {
+
+		let width  = self.image_width();
+		let height = self.image_height();
+
+		let offset = self.offset_for_image(offset);
+		let (left, top) = offset;
+
+		let rows = pixel_buffer.len();
 		let flat_pixels = vec::concat(pixel_buffer);
-		let width = flat_pixels.len() / pixel_buffer.len();
-		return self.import_pixels_flat::<T>(width, height, flat_pixels)
+		let cols = flat_pixels.len() / pixel_buffer.len();
+
+		let right  = left + cols;
+		let bottom = top + rows;
+
+		assert!(right <= width);
+		assert!(bottom <= height);
+
+		return self.import_pixels_flat::<T>(flat_pixels, Some((left, top, right, bottom)));
 	}
 
 	fn new_image(&self, width: u32, height: u32, bg: Option<PixelWand>) -> bool {
