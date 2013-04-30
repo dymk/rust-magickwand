@@ -1,7 +1,7 @@
 /*
  * Definitions for the C interface of Magick Wand
  */
-use types::{FilterTypes, StorageType, MagickWandPtr};
+use types::{FilterTypes, StorageType, MagickWandPtr, PixelWandPtr};
 mod types;
 
 //You'll probably need to change this for linux/OSX.
@@ -30,6 +30,11 @@ pub extern mod wand {
 	fn MagickHasPreviousImage(wand: MagickWandPtr) -> bool;
 
 	//Image manipulation functions
+	fn MagickNewImage(
+	  wand: MagickWandPtr,
+	  cols: libc::size_t,
+	  rows: libc::size_t,
+	  pw: PixelWandPtr) -> bool;
 	fn MagickSetImageFormat(wand: MagickWandPtr, format: *libc::c_char) -> bool;
 	fn MagickAdaptiveResizeImage(
 	  wand: MagickWandPtr,
@@ -77,4 +82,9 @@ pub extern mod wand {
 	fn MagickWriteImage(
 	  wand: MagickWandPtr,
 	  fname: *libc::c_char) -> bool;
+
+	//Pixel wand methods
+	fn NewPixelWand() -> PixelWandPtr;
+	fn DestroyPixelWand(pw: PixelWandPtr);
+	fn IsPixelWand(pw: PixelWandPtr) -> bool;
 }

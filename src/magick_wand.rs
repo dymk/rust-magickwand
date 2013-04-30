@@ -7,6 +7,7 @@
 pub mod wand;
 pub mod types;
 pub mod pixel;
+pub mod pixel_wand;
 pub mod image;
 pub mod wand_extern;
 

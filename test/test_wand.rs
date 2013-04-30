@@ -170,7 +170,16 @@ fn test_import_pixels_flat() {
 	let wand = wand::MagickWand::new();
 	//White line
 	let pixels = vec::from_elem(10, pixel::RGB(255, 255, 255));
-	wand.import_pixels_flat(10, 1, pixels);
+	assert!(wand.new_image(10, 1, None));
+	assert!(wand.import_pixels_flat(10, 1, pixels));
+
+	let ex_pixel = match wand.export_pixels_flat::<pixel::RGB>() {
+		Some(p) => p,
+		None    => fail!(~"expected pixels")
+	};
+	for ex_pixel.each |p| {
+		assert!(*p == pixel::RGB(255, 255, 255));
+	}
 }
 
 #[test]
@@ -180,5 +189,27 @@ fn test_import_pixels() {
 	let pixels = vec::from_fn(5, |_| {
 		vec::from_elem(5, pixel::RGB(255, 255, 255))
 	});
-	wand.import_pixels(pixels);
+	assert!(wand.new_image(5, 5, None));
+	assert!(wand.import_pixels(pixels));
+
+	let ex_pixel = match wand.export_pixels_flat::<pixel::RGB>() {
+		Some(p) => p,
+		None    => fail!(~"expected pixels")
+	};
+	for ex_pixel.each |p| {
+		assert!(*p == pixel::RGB(255, 255, 255));
+	}
+}
+
+#[test]
+fn test_new_image_default_pixels() {
+	let wand = wand::MagickWand::new();
+	assert!(wand.new_image(10, 10, None));
+	let px = match wand.export_pixels_flat::<pixel::RGB>() {
+		Some(p) => p,
+		None    => fail!(~"expected pixels")
+	};
+	for px.each |p| {
+		assert!(*p == pixel::RGB(0, 0, 0));
+	}
 }

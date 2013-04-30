@@ -1,6 +1,7 @@
 use types;
 use wand_extern;
 use types;
+use pixel_wand::PixelWand;
 use pixel;
 
 pub struct MagickWand {
@@ -169,6 +170,17 @@ pub impl MagickWand {
 		let flat_pixels = vec::concat(pixel_buffer);
 		let width = flat_pixels.len() / pixel_buffer.len();
 		return self.import_pixels_flat::<T>(width, height, flat_pixels)
+	}
+
+	fn new_image(&self, width: u32, height: u32, bg: Option<PixelWand>) -> bool {
+		let bg = match bg {
+			Some(pw) => pw,
+			None     => PixelWand::new()
+		};
+		unsafe {
+			wand_extern::wand::MagickNewImage(
+			  self.wand_ptr, width, height, bg.get_ptr())
+		}
 	}
 
 	fn num_images(&self) -> u32 {

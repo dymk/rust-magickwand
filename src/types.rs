@@ -1,4 +1,5 @@
 pub type MagickWandPtr = *libc::c_void;
+pub type PixelWandPtr = *libc::c_void;
 pub type ImagePtr = *libc::c_void;
 
 // "magick/constitute.h", line 25
