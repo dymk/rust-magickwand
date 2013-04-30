@@ -1,5 +1,8 @@
-pub trait FromRGBData {
-	fn fromRGBData(c: RGB) -> Self;
+pub trait FromRGB {
+	fn from_rgb(c: RGB) -> Self;
+}
+pub trait ToRGB {
+	fn to_rgb(&self) -> RGB;
 }
 
 pub struct RGB(u8, u8, u8);
@@ -66,15 +69,15 @@ impl Eq for YIQ {
 	}
 }
 
-impl FromRGBData for RGB {
+impl FromRGB for RGB {
 	#[inline(always)]
-	fn fromRGBData(c: RGB) -> RGB {
+	fn from_rgb(c: RGB) -> RGB {
 		c
 	}
 }
 
-impl FromRGBData for YIQ {
-	fn fromRGBData(c: RGB) -> YIQ {
+impl FromRGB for YIQ {
+	fn from_rgb(c: RGB) -> YIQ {
 		/*
 		 * Thank you kindly,
 		 * http://www.eembc.org/techlit/datasheets/yiq_consumer.pdf
@@ -97,5 +100,34 @@ impl FromRGBData for YIQ {
 		  (0.523 * g) +
 		  (0.311 * b)  ) as i8;
 		YIQ(y, i, q)
+	}
+}
+
+impl ToRGB for RGB {
+	fn to_rgb(&self) -> RGB {
+		*self
+	}
+}
+
+impl ToRGB for YIQ {
+	fn to_rgb(&self) -> RGB {
+		let YIQ(y, i, q) = *self;
+		let y = y as float;
+		let i = i as float;
+		let q = q as float;
+
+		let r = (
+		  (1.000 * y) +
+		  (0.956 * i) +
+		  (0.621 * q) ) as u8;
+		let g = (
+		  (1.000 * y) -
+		  (0.272 * i) -
+		  (0.647 * q) ) as u8;
+		let b = (
+		  (1.000 * y) -
+		  (1.105 * i) +
+		  (1.702 * q) ) as u8;
+		RGB(r, g, b)
 	}
 }

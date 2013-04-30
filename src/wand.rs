@@ -17,7 +17,7 @@ pub impl MagickWand {
 		MagickWand { wand_ptr: ptr }
 	}
 
-	fn isMagickWand(&self) -> bool {
+	fn is_magick_wand(&self) -> bool {
 		unsafe { wand_extern::wand::IsMagickWand(self.wand_ptr) }
 	}
 	fn clear(&self) {
@@ -74,40 +74,40 @@ pub impl MagickWand {
 			  blur)
 		}
 	}
-	fn imageWidth(&self) -> u32 {
+	fn imageWidth(&self) -> uint {
 		unsafe {
-			wand_extern::wand::MagickGetImageWidth(self.wand_ptr)
+			wand_extern::wand::MagickGetImageWidth(self.wand_ptr) as uint
 		}
 	}
-	fn imageHeight(&self) -> u32 {
+	fn imageHeight(&self) -> uint {
 		unsafe {
-			wand_extern::wand::MagickGetImageHeight(self.wand_ptr)
+			wand_extern::wand::MagickGetImageHeight(self.wand_ptr) as uint
 		}
 	}
 
-	fn exportPixels<T : pixel::FromRGBData>(&self) -> Option<~[T]> {
-
-		//Determine the size of the vector we need to allocate
+	fn exportPixelsFlat<T: pixel::FromRGB + Copy>(&self) -> Option<~[T]> {
 		let width = self.imageWidth();
 		let height = self.imageHeight();
-		let num_pixels = (width * height) as uint;
+		let num_pixels = (width * height);
 		let mut pixel_buffer = vec::with_capacity::<pixel::RGB>(num_pixels);
+
 		unsafe {
 			let buffer_ptr = vec::raw::to_ptr(pixel_buffer);
 			let success = wand_extern::wand::MagickExportImagePixels(
 			  self.wand_ptr,
 			  0,
 			  0,
-			  width,
-			  height,
+			  width as u32,
+			  height as u32,
 			  vec::raw::to_ptr(str::to_bytes("RGB")) as *i8,
 			  super::types::CharPixel,
 			  buffer_ptr as *libc::c_void);
 			if success {
 				vec::raw::set_len::<pixel::RGB>(&mut pixel_buffer, num_pixels);
 
-				let pixel_buffer: ~[T] = do vec::map_consume(pixel_buffer) |p| {
-					pixel::FromRGBData::fromRGBData(p)
+				//Map to the requested pixel type
+				let pixel_buffer: ~[T] = do pixel_buffer.map |p| {
+					pixel::FromRGB::from_rgb(*p)
 				};
 
 				Some(pixel_buffer)
@@ -116,6 +116,34 @@ pub impl MagickWand {
 			}
 		}
 	}
+
+	fn exportPixels<T : pixel::FromRGB + Copy>(&self) -> Option<~[~[T]]> {
+
+		//Determine the size of the vector we need to allocate
+		let width = self.imageWidth();
+		let height = self.imageHeight();
+
+		let flat_pixels  = match self.exportPixelsFlat() {
+			Some(p) => p,
+			None    => return None
+		};
+
+		//Make it a nested array of pixels
+		let mut mapped_pixel_buffer = vec::with_capacity::<~[T]>(height);
+		for uint::range(0, height) |h| {
+			let row = flat_pixels.slice(h * width, (h+1) * width).to_owned();
+			mapped_pixel_buffer.push(row);
+		}
+		Some(mapped_pixel_buffer)
+	}
+
+	// TODO: Implement importPixels
+	// fn importPixelsFlat<T : pixel::ToRGB>(&self, pixel_data: &[T]) -> bool {
+
+	// }
+	// fn importPixels<T : pixel::ToRGB>(&self, pixel_data: &[&[T]]) -> bool {
+
+	// }
 
 	fn numberImages(&self) -> u32 {
 		unsafe { wand_extern::wand::MagickGetNumberImages(self.wand_ptr) }

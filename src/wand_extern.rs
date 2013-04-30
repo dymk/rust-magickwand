@@ -61,7 +61,6 @@ pub extern mod wand {
 	  map: *libc::c_char,
 	  storage: StorageType,
 	  pix_buff: *libc::c_void) -> bool;
-	)
 
 	//Read/write file functions
 	// MagickReadImageFile

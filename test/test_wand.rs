@@ -25,9 +25,9 @@ fn test_get_num_images() {
 }
 
 #[test]
-fn test_isMagickWand() {
+fn test_is_magick_wand() {
 	let wand = wand::MagickWand::new();
-	assert!(wand.isMagickWand());
+	assert!(wand.is_magick_wand());
 }
 
 #[test]
@@ -107,8 +107,9 @@ fn test_export_image_pixels() {
 		None         => fail!(~"Export failed")
 	};
 
-	assert!(pixels.len() == 10);
-	for pixels.each |&px| {
+	assert!(pixels.len() == 1);
+	assert!(pixels[0].len() == 10);
+	for pixels[0].each |&px| {
 		assert!(px == pixel::RGB(255, 255, 255));
 	}
 
@@ -119,9 +120,10 @@ fn test_export_image_pixels() {
 		None         => fail!(~"Export failed")
 	};
 
-	let r = pixels[0];
-	let g = pixels[1];
-	let b = pixels[2];
+	let row1 = &pixels[0];
+	let r = row1[0];
+	let g = row1[1];
+	let b = row1[2];
 	assert!(r == pixel::RGB(255, 0, 0));
 	assert!(g == pixel::RGB(0, 255, 0));
 	assert!(b == pixel::RGB(0, 0, 255));
@@ -144,7 +146,25 @@ fn test_export_image_pixels_yiq() {
 		Some(pixels) => pixels,
 		None         => fail!(~"Should have found pixels")
 	};
-	for pixels.each |p| {
+	for pixels[0].each |p| {
 		assert!(*p == pixel::YIQ(255, 0, 0));
 	}
+}
+
+#[test]
+fn test_export_pixels_flat() {
+	let wand = wand::MagickWand::new();
+	assert!(wand.readImage("test/read/white_line_10px_bmp.bmp"));
+	let flat_pixels = match wand.exportPixelsFlat::<pixel::RGB>() {
+		Some(p) => p,
+		None    => fail!(~"Should have found pixels")
+	};
+	assert!(flat_pixels.len() == 10);
+	for flat_pixels.each |p| {
+		assert!(*p == pixel::RGB(255, 255, 255));
+	}
+}
+#[test]
+fn test_import_image_pixels() {
+
 }
