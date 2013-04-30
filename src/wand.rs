@@ -176,8 +176,9 @@ pub impl MagickWand {
 		let offset = self.bounds_for_image(offset);
 		let (left, top, cols, rows) = offset;
 
-		assert!(left+cols <= width);
-		assert!(top+rows <= height);
+		//just let imagemagick catch the bounds error
+		// assert!(left+cols <= width);
+		// assert!(top+rows <= height);
 
 		assert!(cols * rows == pixel_buffer.len());
 
@@ -185,10 +186,9 @@ pub impl MagickWand {
 			p.to_rgb()
 		});
 
-		let success;
 		unsafe {
 			let rgb_buffer_ptr = vec::raw::to_ptr(rgb_pixel_buffer);
-			success = wand_extern::wand::MagickImportImagePixels(
+			return wand_extern::wand::MagickImportImagePixels(
 			  self.wand_ptr,
 			  left as libc::size_t,
 			  top  as libc::size_t,
@@ -198,8 +198,6 @@ pub impl MagickWand {
 			  types::CharPixel,
 			  rgb_buffer_ptr as *libc::c_void);
 		}
-
-		return success;
 	}
 
 	fn import_pixels<T : pixel::ToRGB + Copy>(
@@ -217,13 +215,7 @@ pub impl MagickWand {
 		let flat_pixels = vec::concat(pixel_buffer);
 		let cols = flat_pixels.len() / pixel_buffer.len();
 
-		let right  = left + cols;
-		let bottom = top + rows;
-
-		assert!(right <= width);
-		assert!(bottom <= height);
-
-		return self.import_pixels_flat::<T>(flat_pixels, Some((left, top, right, bottom)));
+		return self.import_pixels_flat::<T>(flat_pixels, Some((left, top, cols, rows)));
 	}
 
 	fn new_image(&self, width: u32, height: u32, bg: Option<PixelWand>) -> bool {

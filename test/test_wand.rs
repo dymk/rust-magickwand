@@ -202,6 +202,41 @@ fn test_import_pixels() {
 }
 
 #[test]
+fn test_import_pixels_offseted() {
+	let wand = wand::MagickWand::new();
+	assert!(wand.new_image(2, 2, None));
+
+	//Make the bottom half white
+	let px = ~[~[pixel::RGB(255, 255, 255), pixel::RGB(255, 255, 255)]];
+	assert!(wand.import_pixels(px, Some((0, 1))));
+	let px = match wand.export_pixels::<pixel::RGB>(None) {
+		Some(p) => p,
+		None    => fail!(~"Expected pixels")
+	};
+	assert!(px[0][0] == pixel::RGB(0, 0, 0)); //Top row
+	assert!(px[0][1] == pixel::RGB(0, 0, 0));
+	assert!(px[1][0] == pixel::RGB(255, 255, 255)); //Bottom row
+	assert!(px[1][1] == pixel::RGB(255, 255, 255));
+}
+
+#[test]
+fn test_import_pixels_invalid_offset() {
+	let wand = wand::MagickWand::new();
+	assert!(wand.new_image(2, 2, None));
+
+	//Make the bottom half white
+	let px = ~[~[pixel::RGB(255, 255, 255), pixel::RGB(255, 255, 255)]];
+	assert!(wand.import_pixels(px, Some((1, 1)))); //offset would put px out of range
+	match wand.export_pixels::<pixel::RGB>(None) {
+		Some(p) => {
+			io::println(fmt!("%?", p));
+			fail!(~"did not expect pixels")
+		},
+		None    => assert!(true)
+	}
+}
+
+#[test]
 fn test_new_image_default_pixels() {
 	let wand = wand::MagickWand::new();
 	assert!(wand.new_image(10, 10, None));
