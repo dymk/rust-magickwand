@@ -164,7 +164,21 @@ fn test_export_pixels_flat() {
 		assert!(*p == pixel::RGB(255, 255, 255));
 	}
 }
-#[test]
-fn test_import_image_pixels() {
 
+#[test]
+fn test_import_pixels_flat() {
+	let wand = wand::MagickWand::new();
+	//White line
+	let pixels = vec::from_elem(10, pixel::RGB(255, 255, 255));
+	wand.import_pixels_flat(10, 1, pixels);
+}
+
+#[test]
+fn test_import_pixels() {
+	let wand = wand::MagickWand::new();
+	//White 5x5 rectangle
+	let pixels = vec::from_fn(5, |_| {
+		vec::from_elem(5, pixel::RGB(255, 255, 255))
+	});
+	wand.import_pixels(pixels);
 }

@@ -111,6 +111,10 @@ impl ToRGB for RGB {
 
 impl ToRGB for YIQ {
 	fn to_rgb(&self) -> RGB {
+		/*
+		 * Thank ya kindly,
+		 * http://www.cs.rit.edu/~ncs/color/t_convert.html
+		 */
 		let YIQ(y, i, q) = *self;
 		let y = y as float;
 		let i = i as float;

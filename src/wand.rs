@@ -100,7 +100,7 @@ pub impl MagickWand {
 			  width as u32,
 			  height as u32,
 			  vec::raw::to_ptr(str::to_bytes("RGB")) as *i8,
-			  super::types::CharPixel,
+			  types::CharPixel,
 			  buffer_ptr as *libc::c_void);
 			if success {
 				vec::raw::set_len::<pixel::RGB>(&mut pixel_buffer, num_pixels);
@@ -137,13 +137,39 @@ pub impl MagickWand {
 		Some(mapped_pixel_buffer)
 	}
 
-	// TODO: Implement importPixels
-	// fn importPixelsFlat<T : pixel::ToRGB>(&self, pixel_data: &[T]) -> bool {
+	fn import_pixels_flat<T : pixel::ToRGB>(
+	    &self,
+	    width: uint,
+	    height: uint,
+	    pixel_buffer: &[T]) -> bool {
+		assert!(width * height == pixel_buffer.len());
 
-	// }
-	// fn importPixels<T : pixel::ToRGB>(&self, pixel_data: &[&[T]]) -> bool {
+		let rgb_pixel_buffer = pixel_buffer.map(|p| {
+			p.to_rgb()
+		});
 
-	// }
+		let success;
+		unsafe {
+			let rgb_buffer_ptr = vec::raw::to_ptr(rgb_pixel_buffer);
+			success = wand_extern::wand::MagickImportImagePixels(
+			  self.wand_ptr,
+			  0, 0, width as u32, height as u32,
+			  vec::raw::to_ptr(str::to_bytes("RGB")) as *i8,
+			  types::CharPixel,
+			  rgb_buffer_ptr as *libc::c_void);
+		}
+
+		return success;
+	}
+
+	fn import_pixels<T : pixel::ToRGB + Copy>(
+	    &self,
+	    pixel_buffer: &[~[T]]) -> bool {
+		let height = pixel_buffer.len();
+		let flat_pixels = vec::concat(pixel_buffer);
+		let width = flat_pixels.len() / pixel_buffer.len();
+		return self.import_pixels_flat::<T>(width, height, flat_pixels)
+	}
 
 	fn num_images(&self) -> u32 {
 		unsafe { wand_extern::wand::MagickGetNumberImages(self.wand_ptr) }
