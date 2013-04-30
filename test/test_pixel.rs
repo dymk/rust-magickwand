@@ -15,3 +15,9 @@ fn test_yiq_to_rgb() {
 	let yiq_2_rgb = yiq.to_rgb();
 	assert!(yiq_2_rgb == rgb);
 }
+
+#[test]
+fn test_rgb_to_rgb() {
+	let rgb = RGB(255, 255, 255);
+	assert!(rgb == rgb.to_rgb());
+}

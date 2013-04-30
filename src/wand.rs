@@ -23,10 +23,10 @@ pub impl MagickWand {
 	fn clear(&self) {
 		unsafe { wand_extern::wand::ClearMagickWand(self.wand_ptr) }
 	}
-	fn adaptiveResizeImage(&self, cols: u32, rows: u32) -> bool {
+	fn adaptive_resize_image(&self, cols: u32, rows: u32) -> bool {
 		unsafe { wand_extern::wand::MagickAdaptiveResizeImage(self.wand_ptr, cols, rows) }
 	}
-	fn readImage(&self, fname: &str) -> bool {
+	fn read_image(&self, fname: &str) -> bool {
 		let path_bytes = str::to_bytes(fname);
 
 		unsafe {
@@ -34,7 +34,7 @@ pub impl MagickWand {
 			wand_extern::wand::MagickReadImage(self.wand_ptr, raw_path_bytes as *i8)
 		}
 	}
-	fn writeImage(&self, fname: &str) -> bool {
+	fn write_image(&self, fname: &str) -> bool {
 		let path_bytes = str::to_bytes(fname);
 
 		unsafe {
@@ -42,7 +42,7 @@ pub impl MagickWand {
 			wand_extern::wand::MagickWriteImage(self.wand_ptr, raw_path_bytes as *i8)
 		}
 	}
-	fn readImageBlob(&self, blob: &[u8]) -> bool {
+	fn read_imageBlob(&self, blob: &[u8]) -> bool {
 		unsafe {
 			wand_extern::wand::MagickReadImageBlob(
 			  self.wand_ptr,
@@ -50,7 +50,7 @@ pub impl MagickWand {
 			  blob.len() as u32)
 		}
 	}
-	fn getImageBlob(&self) -> ~[u8] {
+	fn image_blob(&self) -> ~[u8] {
 		let mut len: u32 = 0;
 		unsafe {
 			let blob = wand_extern::wand::MagickGetImageBlob(self.wand_ptr, &len);
@@ -59,7 +59,7 @@ pub impl MagickWand {
 			return v;
 		}
 	}
-	fn resizeImage(
+	fn resize_image(
 	  &self,
 	  cols: u32,
 	  rows: u32,
@@ -74,20 +74,20 @@ pub impl MagickWand {
 			  blur)
 		}
 	}
-	fn imageWidth(&self) -> uint {
+	fn image_width(&self) -> uint {
 		unsafe {
 			wand_extern::wand::MagickGetImageWidth(self.wand_ptr) as uint
 		}
 	}
-	fn imageHeight(&self) -> uint {
+	fn image_height(&self) -> uint {
 		unsafe {
 			wand_extern::wand::MagickGetImageHeight(self.wand_ptr) as uint
 		}
 	}
 
-	fn exportPixelsFlat<T: pixel::FromRGB + Copy>(&self) -> Option<~[T]> {
-		let width = self.imageWidth();
-		let height = self.imageHeight();
+	fn export_pixels_flat<T: pixel::FromRGB + Copy>(&self) -> Option<~[T]> {
+		let width = self.image_width();
+		let height = self.image_height();
 		let num_pixels = (width * height);
 		let mut pixel_buffer = vec::with_capacity::<pixel::RGB>(num_pixels);
 
@@ -117,13 +117,13 @@ pub impl MagickWand {
 		}
 	}
 
-	fn exportPixels<T : pixel::FromRGB + Copy>(&self) -> Option<~[~[T]]> {
+	fn export_pixels<T : pixel::FromRGB + Copy>(&self) -> Option<~[~[T]]> {
 
 		//Determine the size of the vector we need to allocate
-		let width = self.imageWidth();
-		let height = self.imageHeight();
+		let width = self.image_width();
+		let height = self.image_height();
 
-		let flat_pixels  = match self.exportPixelsFlat() {
+		let flat_pixels  = match self.export_pixels_flat() {
 			Some(p) => p,
 			None    => return None
 		};
@@ -145,16 +145,16 @@ pub impl MagickWand {
 
 	// }
 
-	fn numberImages(&self) -> u32 {
+	fn num_images(&self) -> u32 {
 		unsafe { wand_extern::wand::MagickGetNumberImages(self.wand_ptr) }
 	}
-	fn imageTotalInkDensity(&self) -> f64 {
+	fn image_total_ink_density(&self) -> f64 {
 		unsafe { wand_extern::wand::MagickGetImageTotalInkDensity(self.wand_ptr) }
 	}
-	fn hasNextImage(&self) -> bool {
+	fn has_next_image(&self) -> bool {
 		unsafe { wand_extern::wand::MagickHasNextImage(self.wand_ptr) }
 	}
-	fn hasPreviousImage(&self) -> bool {
+	fn has_previous_image(&self) -> bool {
 		unsafe { wand_extern::wand::MagickHasNextImage(self.wand_ptr) }
 	}
 }

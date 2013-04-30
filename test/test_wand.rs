@@ -10,18 +10,18 @@ fn test_new_wand() {
 #[test]
 fn test_clone_wand() {
 	let wand = wand::MagickWand::new();
-	assert!(wand.readImage("test/read/small_bmp.bmp"));
+	assert!(wand.read_image("test/read/small_bmp.bmp"));
 	let second_wand = wand.clone();
 	wand.clear();
-	assert!(second_wand.numberImages() == 1);
+	assert!(second_wand.num_images() == 1);
 }
 
 #[test]
 fn test_get_num_images() {
 	let wand = wand::MagickWand::new();
-	assert!(wand.numberImages() == 0);
-	assert!(wand.readImage("test/read/small_bmp.bmp"));
-	assert!(wand.numberImages() == 1);
+	assert!(wand.num_images() == 0);
+	assert!(wand.read_image("test/read/small_bmp.bmp"));
+	assert!(wand.num_images() == 1);
 }
 
 #[test]
@@ -39,70 +39,70 @@ fn test_clear() {
 #[test]
 fn test_read_image() {
 	let wand = wand::MagickWand::new();
-	assert!(wand.readImage("test/read/small_bmp.bmp") == true);
-	assert!(wand.readImage("test/non_existant_image.bmp") == false);
+	assert!(wand.read_image("test/read/small_bmp.bmp") == true);
+	assert!(wand.read_image("test/non_existant_image.bmp") == false);
 }
 
 #[test]
 fn test_adaptive_resize_image() {
 	let wand = wand::MagickWand::new();
-	assert!(wand.readImage("test/read/small_bmp.bmp"));
-	assert!(wand.adaptiveResizeImage(10, 10));
+	assert!(wand.read_image("test/read/small_bmp.bmp"));
+	assert!(wand.adaptive_resize_image(10, 10));
 }
 
 #[test]
 fn test_write_image() {
 	let wand = wand::MagickWand::new();
-	assert!(wand.readImage("test/read/small_bmp.bmp"));
-	assert!(wand.writeImage("test/written/small_bmp.bmp"));
+	assert!(wand.read_image("test/read/small_bmp.bmp"));
+	assert!(wand.write_image("test/written/small_bmp.bmp"));
 }
 
 #[test]
 fn test_adaptive_resize_write_image() {
 	let wand = wand::MagickWand::new();
-	assert!(wand.readImage("test/read/small_bmp.bmp"));
-	assert!(wand.adaptiveResizeImage(100, 100));
-	assert!(wand.writeImage("test/written/small_bmp_adaptive_resize.bmp"));
+	assert!(wand.read_image("test/read/small_bmp.bmp"));
+	assert!(wand.adaptive_resize_image(100, 100));
+	assert!(wand.write_image("test/written/small_bmp_adaptive_resize.bmp"));
 }
 
 #[test]
 fn test_resize() {
 	let wand = wand::MagickWand::new();
-	assert!(wand.readImage("test/read/small_bmp.bmp"));
-	assert!(wand.resizeImage(100, 50, types::TriangleFilter, 0.0));
+	assert!(wand.read_image("test/read/small_bmp.bmp"));
+	assert!(wand.resize_image(100, 50, types::TriangleFilter, 0.0));
 
 	let wand = wand::MagickWand::new();
-	assert!(wand.readImage("test/small_bmp_nonexistant.bmp") == false);
-	assert!(wand.resizeImage(100, 50, types::TriangleFilter, 0.0) == false);
+	assert!(wand.read_image("test/small_bmp_nonexistant.bmp") == false);
+	assert!(wand.resize_image(100, 50, types::TriangleFilter, 0.0) == false);
 }
 
 #[test]
 fn test_resize_write_image() {
 	let wand = wand::MagickWand::new();
-	assert!(wand.readImage("test/read/small_bmp.bmp"));
-	assert!(wand.resizeImage(100, 50, types::LanczosFilter, 1.0));
-	assert!(wand.writeImage("test/written/small_bmp_resize.bmp"));
+	assert!(wand.read_image("test/read/small_bmp.bmp"));
+	assert!(wand.resize_image(100, 50, types::LanczosFilter, 1.0));
+	assert!(wand.write_image("test/written/small_bmp_resize.bmp"));
 }
 
 #[test]
 fn test_image_width() {
 	let wand = wand::MagickWand::new();
-	assert!(wand.readImage("test/read/white_line_10px_bmp.bmp"));
-	assert!(wand.imageWidth() == 10);
+	assert!(wand.read_image("test/read/white_line_10px_bmp.bmp"));
+	assert!(wand.image_width() == 10);
 }
 
 #[test]
 fn test_image_height() {
 	let wand = wand::MagickWand::new();
-	assert!(wand.readImage("test/read/white_line_10px_bmp.bmp"));
-	assert!(wand.imageHeight() == 1);
+	assert!(wand.read_image("test/read/white_line_10px_bmp.bmp"));
+	assert!(wand.image_height() == 1);
 }
 
 #[test]
 fn test_export_image_pixels() {
 	let wand = wand::MagickWand::new();
-	assert!(wand.readImage("test/read/white_line_10px_bmp.bmp"));
-	let pixels = match wand.exportPixels::<pixel::RGB>() {
+	assert!(wand.read_image("test/read/white_line_10px_bmp.bmp"));
+	let pixels = match wand.export_pixels::<pixel::RGB>() {
 		Some(pixels) => pixels,
 		None         => fail!(~"Export failed")
 	};
@@ -114,8 +114,8 @@ fn test_export_image_pixels() {
 	}
 
 	let wand = wand::MagickWand::new();
-	assert!(wand.readImage("test/read/rgb_line_3px_bmp.bmp"));
-	let pixels = match wand.exportPixels::<pixel::RGB>() {
+	assert!(wand.read_image("test/read/rgb_line_3px_bmp.bmp"));
+	let pixels = match wand.export_pixels::<pixel::RGB>() {
 		Some(pixels) => pixels,
 		None         => fail!(~"Export failed")
 	};
@@ -132,7 +132,7 @@ fn test_export_image_pixels() {
 #[test]
 fn test_export_image_pixels_without_image() {
 	let wand = wand::MagickWand::new();
-	match wand.exportPixels::<pixel::RGB>() {
+	match wand.export_pixels::<pixel::RGB>() {
 		Some(_) => fail!(~"Pixels not expected"),
 		None    => assert!(true)
 	}
@@ -141,8 +141,8 @@ fn test_export_image_pixels_without_image() {
 #[test]
 fn test_export_image_pixels_yiq() {
 	let wand = wand::MagickWand::new();
-	assert!(wand.readImage("test/read/white_line_10px_bmp.bmp"));
-	let pixels = match wand.exportPixels::<pixel::YIQ>() {
+	assert!(wand.read_image("test/read/white_line_10px_bmp.bmp"));
+	let pixels = match wand.export_pixels::<pixel::YIQ>() {
 		Some(pixels) => pixels,
 		None         => fail!(~"Should have found pixels")
 	};
@@ -154,8 +154,8 @@ fn test_export_image_pixels_yiq() {
 #[test]
 fn test_export_pixels_flat() {
 	let wand = wand::MagickWand::new();
-	assert!(wand.readImage("test/read/white_line_10px_bmp.bmp"));
-	let flat_pixels = match wand.exportPixelsFlat::<pixel::RGB>() {
+	assert!(wand.read_image("test/read/white_line_10px_bmp.bmp"));
+	let flat_pixels = match wand.export_pixels_flat::<pixel::RGB>() {
 		Some(p) => p,
 		None    => fail!(~"Should have found pixels")
 	};
