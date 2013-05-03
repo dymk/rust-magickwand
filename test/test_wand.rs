@@ -13,15 +13,15 @@ fn test_clone_wand() {
 	assert!(wand.read_image("test/read/small_bmp.bmp"));
 	let second_wand = wand.clone();
 	wand.clear();
-	assert!(second_wand.num_images() == 1);
+	assert_eq!(second_wand.num_images(), 1);
 }
 
 #[test]
 fn test_get_num_images() {
 	let wand = wand::MagickWand::new();
-	assert!(wand.num_images() == 0);
+	assert_eq!(wand.num_images(), 0);
 	assert!(wand.read_image("test/read/small_bmp.bmp"));
-	assert!(wand.num_images() == 1);
+	assert_eq!(wand.num_images(), 1);
 }
 
 #[test]
@@ -39,7 +39,7 @@ fn test_clear() {
 #[test]
 fn test_read_image() {
 	let wand = wand::MagickWand::new();
-	assert!(wand.read_image("test/read/small_bmp.bmp") == true);
+	assert!(wand.read_image("test/read/small_bmp.bmp")     == true);
 	assert!(wand.read_image("test/non_existant_image.bmp") == false);
 }
 
@@ -72,7 +72,7 @@ fn test_resize() {
 	assert!(wand.resize_image(100, 50, types::TriangleFilter, 0.0));
 
 	let wand = wand::MagickWand::new();
-	assert!(wand.read_image("test/small_bmp_nonexistant.bmp") == false);
+	assert!(wand.read_image("test/small_bmp_nonexistant.bmp")      == false);
 	assert!(wand.resize_image(100, 50, types::TriangleFilter, 0.0) == false);
 }
 
@@ -88,45 +88,39 @@ fn test_resize_write_image() {
 fn test_image_width() {
 	let wand = wand::MagickWand::new();
 	assert!(wand.read_image("test/read/white_line_10px_bmp.bmp"));
-	assert!(wand.image_width() == 10);
+	assert_eq!(wand.image_width(), 10);
 }
 
 #[test]
 fn test_image_height() {
 	let wand = wand::MagickWand::new();
 	assert!(wand.read_image("test/read/white_line_10px_bmp.bmp"));
-	assert!(wand.image_height() == 1);
+	assert_eq!(wand.image_height(), 1);
 }
 
 #[test]
 fn test_export_image_pixels() {
 	let wand = wand::MagickWand::new();
 	assert!(wand.read_image("test/read/white_line_10px_bmp.bmp"));
-	let pixels = match wand.export_image_pixels::<RGB>(None, None) {
-		Some(pixels) => pixels,
-		None         => fail!(~"Export failed")
-	};
+	let pixels = wand.export_image_pixels::<RGB>(None, None).unwrap();
 
-	assert!(pixels.len() == 1);
-	assert!(pixels[0].len() == 10);
+	assert_eq!(pixels.len(), 1);
+	assert_eq!(pixels[0].len(), 10);
 	for pixels[0].each |&px| {
-		assert!(px == RGB(255, 255, 255));
+		assert_eq!(px, RGB(255, 255, 255));
 	}
 
 	let wand = wand::MagickWand::new();
 	assert!(wand.read_image("test/read/rgb_line_3px_bmp.bmp"));
-	let pixels = match wand.export_image_pixels::<RGB>(None, None) {
-		Some(pixels) => pixels,
-		None         => fail!(~"Export failed")
-	};
+	let pixels = wand.export_image_pixels::<RGB>(None, None).unwrap();
 
 	let row1 = &pixels[0];
 	let r = row1[0];
 	let g = row1[1];
 	let b = row1[2];
-	assert!(r == RGB(255, 0, 0));
-	assert!(g == RGB(0, 255, 0));
-	assert!(b == RGB(0, 0, 255));
+	assert_eq!(r, RGB(255, 0, 0));
+	assert_eq!(g, RGB(0, 255, 0));
+	assert_eq!(b, RGB(0, 0, 255));
 }
 
 #[test]
@@ -147,7 +141,7 @@ fn test_export_image_pixels_yiq() {
 		None         => fail!(~"Should have found pixels")
 	};
 	for pixels[0].each |p| {
-		assert!(*p == YIQ(255, 0, 0));
+		assert_eq!(*p, YIQ(255, 0, 0));
 	}
 }
 
@@ -155,13 +149,12 @@ fn test_export_image_pixels_yiq() {
 fn test_export_image_pixels_flat() {
 	let wand = wand::MagickWand::new();
 	assert!(wand.read_image("test/read/white_line_10px_bmp.bmp"));
-	let flat_pixels = match wand.export_image_pixels_flat::<RGB>(None, None) {
-		Some(p) => p,
-		None    => fail!(~"Should have found pixels")
-	};
-	assert!(flat_pixels.len() == 10);
+
+	let flat_pixels = wand.export_image_pixels_flat::<RGB>(None, None).unwrap();
+	assert_eq!(flat_pixels.len(), 10);
+
 	for flat_pixels.each |p| {
-		assert!(*p == RGB(255, 255, 255));
+		assert_eq!(*p, RGB(255, 255, 255));
 	}
 }
 
@@ -173,12 +166,9 @@ fn test_import_pixels_flat() {
 	assert!(wand.new_image(10, 1, None));
 	assert!(wand.import_image_pixels_flat(pixels, Some((0, 0)), Some((10, 1))));
 
-	let ex_pixel = match wand.export_image_pixels_flat::<RGB>(None, None) {
-		Some(p) => p,
-		None    => fail!(~"expected pixels")
-	};
+	let ex_pixel = wand.export_image_pixels_flat::<RGB>(None, None).unwrap();
 	for ex_pixel.each |p| {
-		assert!(*p == RGB(255, 255, 255));
+		assert_eq!(*p, RGB(255, 255, 255));
 	}
 }
 
@@ -192,12 +182,9 @@ fn test_import_pixels() {
 	assert!(wand.new_image(5, 5, None));
 	assert!(wand.import_image_pixels(pixels, None));
 
-	let ex_pixel = match wand.export_image_pixels_flat::<RGB>(None, None) {
-		Some(p) => p,
-		None    => fail!(~"expected pixels")
-	};
+	let ex_pixel = wand.export_image_pixels_flat::<RGB>(None, None).unwrap();
 	for ex_pixel.each |p| {
-		assert!(*p == RGB(255, 255, 255));
+		assert_eq!(*p, RGB(255, 255, 255));
 	}
 }
 
@@ -220,13 +207,10 @@ fn test_import_pixels_offseted() {
 fn test_new_image_default_pixels() {
 	let wand = wand::MagickWand::new();
 	assert!(wand.new_image(10, 10, None));
-	let px = match wand.export_image_pixels_flat::<RGB>(None, None) {
-		Some(p) => p,
-		None    => fail!(~"expected pixels")
-	};
+	let px = wand.export_image_pixels_flat::<RGB>(None, None).unwrap();
 	assert_eq!(px.len(), 100);
 	for px.each |p| {
-		assert!(*p == RGB(0, 0, 0));
+		assert_eq!(*p, RGB(0, 0, 0));
 	}
 }
 

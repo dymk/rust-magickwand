@@ -23,7 +23,7 @@ fn test_magick_read_image() {
 		let wand = wand_extern::wand::NewMagickWand();
 		let path_bytes = str::to_bytes("test/read/small_bmp.bmp");
 		let raw_path_bytes = vec::raw::to_ptr(path_bytes);
-		assert!(wand_extern::wand::MagickReadImage(wand, raw_path_bytes as *libc::c_char) == true);
+		assert!(wand_extern::wand::MagickReadImage(wand, raw_path_bytes as *libc::c_char));
 		assert!(wand_extern::wand::MagickIdentifyImage(wand) != ptr::null());
 	}
 }
@@ -36,8 +36,8 @@ fn test_adaptive_resize_image() {
 		wand_extern::wand::MagickReadImage(
 			wand,
 			vec::raw::to_ptr(str::to_bytes("test/read/small_bmp.bmp")) as *i8
-		) == true);
-		assert!(wand_extern::wand::MagickAdaptiveResizeImage(wand, 10, 10) == true);
+		));
+		assert!(wand_extern::wand::MagickAdaptiveResizeImage(wand, 10, 10));
 	}
 }
 
@@ -62,7 +62,7 @@ fn test_identify_image() {
 	unsafe {
 		let wand = wand_extern::wand::NewMagickWand();
 		let attrs = wand_extern::wand::MagickIdentifyImage(wand);
-		assert!(attrs == ptr::null());
+		assert_eq!(attrs, ptr::null());
 	}
 
 	unsafe {
@@ -104,8 +104,8 @@ fn test_magick_get_image_blob() {
 		let wand = wand_extern::wand::NewMagickWand();
 		let mut len: libc::size_t = 0;
 		let blob = wand_extern::wand::MagickGetImageBlob(wand, &len);
-		assert!(len == 0);
-		assert!(blob == ptr::null());
+		assert_eq!(len, 0);
+		assert_eq!(blob, ptr::null());
 		wand_extern::wand::DestroyMagickWand(wand);
 	}
 
