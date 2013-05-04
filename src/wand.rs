@@ -138,7 +138,7 @@ pub impl MagickWand {
 
 				//Map to the requested pixel type
 				let pixel_buffer: ~[T] = do pixel_buffer.map |p| {
-					pixel::FromRGB::from_rgb(*p)
+					pixel::FromRGB::from(*p)
 				};
 
 				Some(pixel_buffer)

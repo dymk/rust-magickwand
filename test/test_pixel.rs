@@ -1,10 +1,10 @@
-use pixel::{YIQ, RGB, FromRGB, ToRGB};
+use pixel::{YIQ, RGB, ToYIQ, ToRGB};
 
 #[test]
 fn test_rgb_to_yiq() {
 	let rgb = RGB(255, 255, 255);
 	let yiq = YIQ(255,   0,   0);
-	let rgb_2_yiq: YIQ = FromRGB::from_rgb(rgb);
+	let rgb_2_yiq = rgb.to_yiq();
 	assert_eq!(rgb_2_yiq, yiq);
 }
 

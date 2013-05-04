@@ -1,8 +1,16 @@
-pub trait FromRGB {
-	fn from_rgb(c: RGB) -> Self;
+pub trait ToYIQ {
+	fn to_yiq(&self) -> YIQ;
+	fn from(&c: Self) -> YIQ;
 }
 pub trait ToRGB {
 	fn to_rgb(&self) -> RGB;
+	fn from(&c: Self) -> RGB;
+}
+pub trait FromRGB {
+	fn from(c: RGB) -> Self;
+}
+pub trait FromYIQ {
+	fn from(c: YIQ) -> Self;
 }
 
 pub struct RGB(u8, u8, u8);
@@ -69,15 +77,23 @@ impl Eq for YIQ {
 	}
 }
 
-impl FromRGB for RGB {
+impl ToYIQ for YIQ {
 	#[inline(always)]
-	fn from_rgb(c: RGB) -> RGB {
+	fn to_yiq(&self) -> YIQ {
+		ToYIQ::from(*self)
+	}
+	#[inline(always)]
+	fn from(c: YIQ) -> YIQ {
 		c
 	}
 }
 
-impl FromRGB for YIQ {
-	fn from_rgb(c: RGB) -> YIQ {
+impl ToYIQ for RGB {
+	#[inline(always)]
+	fn to_yiq(&self) -> YIQ {
+		ToYIQ::from(*self)
+	}
+	fn from(c: RGB) -> YIQ {
 		/*
 		 * Thank you kindly,
 		 * http://www.eembc.org/techlit/datasheets/yiq_consumer.pdf
@@ -100,22 +116,32 @@ impl FromRGB for YIQ {
 		  (0.523 * g) +
 		  (0.311 * b)  ) as i8;
 		YIQ(y, i, q)
+
 	}
 }
 
 impl ToRGB for RGB {
+	#[inline(always)]
 	fn to_rgb(&self) -> RGB {
-		*self
+		ToRGB::from(*self)
+	}
+	#[inline(always)]
+	fn from(c: RGB) -> RGB {
+		c
 	}
 }
 
 impl ToRGB for YIQ {
+	#[inline(always)]
 	fn to_rgb(&self) -> RGB {
+		ToRGB::from(*self)
+	}
+	fn from(c: YIQ) -> RGB {
 		/*
 		 * Thank ya kindly,
 		 * http://www.cs.rit.edu/~ncs/color/t_convert.html
 		 */
-		let YIQ(y, i, q) = *self;
+		let YIQ(y, i, q) = c;
 		let y = y as float;
 		let i = i as float;
 		let q = q as float;
@@ -133,5 +159,33 @@ impl ToRGB for YIQ {
 		  (1.105 * i) +
 		  (1.702 * q) ) as u8;
 		RGB(r, g, b)
+	}
+}
+
+impl FromYIQ for YIQ {
+	#[inline(always)]
+	fn from(c: YIQ) -> YIQ {
+		c
+	}
+}
+
+impl FromYIQ for RGB {
+	#[inline(always)]
+	fn from(c: YIQ) -> RGB {
+		c.to_rgb()
+	}
+}
+
+impl FromRGB for YIQ {
+	#[inline(always)]
+	fn from(c: RGB) -> YIQ {
+		c.to_yiq()
+	}
+}
+
+impl FromRGB for RGB {
+	#[inline(always)]
+	fn from(c: RGB) -> RGB {
+		c
 	}
 }
