@@ -9,14 +9,14 @@ pub impl PixelWand {
 	fn new() -> PixelWand {
 		let ptr;
 		unsafe {
-			ptr = wand_extern::wand::NewPixelWand();
+			ptr = wand_extern::NewPixelWand();
 		}
 		PixelWand { pxwand_ptr: ptr }
 	}
 
 	fn is_pixel_wand(&self) -> bool {
 		unsafe {
-			wand_extern::wand::IsPixelWand(self.pxwand_ptr)
+			wand_extern::IsPixelWand(self.pxwand_ptr)
 		}
 	}
 
@@ -28,7 +28,7 @@ pub impl PixelWand {
 impl Drop for PixelWand {
 	fn finalize(&self) {
 		unsafe {
-			wand_extern::wand::DestroyPixelWand(self.pxwand_ptr);
+			wand_extern::DestroyPixelWand(self.pxwand_ptr);
 		}
 	}
 }
