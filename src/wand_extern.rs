@@ -5,10 +5,9 @@ use types::{FilterTypes, StorageType, MagickWandPtr, PixelWandPtr};
 mod types;
 
 //You'll probably need to change this for linux/OSX.
-#[link_name = "CORE_DB_wand_"]
-#[link_args = "-LG:\\Programs\\ImageMagick-6.8.4\\VisualMagick\\lib"]
-pub extern mod wand {
-
+#[link_args = "-LG:\\Programs\\ImageMagick-6.8.4\\VisualMagick\\lib -lCORE_DB_wand_"]
+// #[link_args = "-lCORE_DB_wand_"]
+pub extern {
 	fn MagickWandGenesis();  //Tested
 	fn MagickWandTerminus(); //Tested
 
@@ -78,7 +77,7 @@ pub extern mod wand {
 	  fname: *libc::c_char) -> bool; //Tested
 	fn MagickGetImageBlob(
 	  wand: MagickWandPtr,
-	  length: *libc::size_t) -> *libc::c_void; //Tested
+	  length: *mut libc::size_t) -> *libc::c_void; //Tested
 	fn MagickWriteImage(
 	  wand: MagickWandPtr,
 	  fname: *libc::c_char) -> bool;

@@ -1,6 +1,5 @@
 use types;
 use wand_extern;
-use types;
 use pixel_wand::PixelWand;
 use pixel;
 
@@ -11,7 +10,7 @@ pub struct MagickWand {
 pub impl MagickWand {
 	fn new() -> MagickWand {
 		let ptr;
-		unsafe { ptr = wand_extern::wand::NewMagickWand() }
+		unsafe { ptr = wand_extern::NewMagickWand() }
 		MagickWand::new_with_ptr(ptr)
 	}
 	priv fn new_with_ptr(ptr: types::MagickWandPtr) -> MagickWand {
@@ -19,20 +18,20 @@ pub impl MagickWand {
 	}
 
 	fn is_magick_wand(&self) -> bool {
-		unsafe { wand_extern::wand::IsMagickWand(self.wand_ptr) }
+		unsafe { wand_extern::IsMagickWand(self.wand_ptr) }
 	}
 	fn clear(&self) {
-		unsafe { wand_extern::wand::ClearMagickWand(self.wand_ptr) }
+		unsafe { wand_extern::ClearMagickWand(self.wand_ptr) }
 	}
 	fn adaptive_resize_image(&self, cols: u32, rows: u32) -> bool {
-		unsafe { wand_extern::wand::MagickAdaptiveResizeImage(self.wand_ptr, cols, rows) }
+		unsafe { wand_extern::MagickAdaptiveResizeImage(self.wand_ptr, cols, rows) }
 	}
 	fn read_image(&self, fname: &str) -> bool {
 		let path_bytes = str::to_bytes(fname);
 
 		unsafe {
 			let raw_path_bytes = vec::raw::to_ptr(path_bytes);
-			wand_extern::wand::MagickReadImage(self.wand_ptr, raw_path_bytes as *i8)
+			wand_extern::MagickReadImage(self.wand_ptr, raw_path_bytes as *i8)
 		}
 	}
 	fn write_image(&self, fname: &str) -> bool {
@@ -40,23 +39,23 @@ pub impl MagickWand {
 
 		unsafe {
 			let raw_path_bytes = vec::raw::to_ptr(path_bytes);
-			wand_extern::wand::MagickWriteImage(self.wand_ptr, raw_path_bytes as *i8)
+			wand_extern::MagickWriteImage(self.wand_ptr, raw_path_bytes as *i8)
 		}
 	}
 	fn read_imageBlob(&self, blob: &[u8]) -> bool {
 		unsafe {
-			wand_extern::wand::MagickReadImageBlob(
+			wand_extern::MagickReadImageBlob(
 			  self.wand_ptr,
 			  vec::raw::to_ptr(blob),
 			  blob.len() as u32)
 		}
 	}
 	fn image_blob(&self) -> ~[u8] {
-		let mut len: u32 = 0;
 		unsafe {
-			let blob = wand_extern::wand::MagickGetImageBlob(self.wand_ptr, &len);
+			let mut len: u32 = 0;
+			let blob = wand_extern::MagickGetImageBlob(self.wand_ptr, &mut len);
 			let v: ~[u8] = vec::from_buf(blob as *u8, len as uint);
-			wand_extern::wand::MagickRelinquishMemory(blob);
+			wand_extern::MagickRelinquishMemory(blob);
 			return v;
 		}
 	}
@@ -67,7 +66,7 @@ pub impl MagickWand {
 	  filter: types::FilterTypes,
 	  blur: f64) -> bool {
 		unsafe {
-			wand_extern::wand::MagickResizeImage(
+			wand_extern::MagickResizeImage(
 			  self.wand_ptr,
 			  cols,
 			  rows,
@@ -77,12 +76,12 @@ pub impl MagickWand {
 	}
 	fn image_width(&self) -> uint {
 		unsafe {
-			wand_extern::wand::MagickGetImageWidth(self.wand_ptr) as uint
+			wand_extern::MagickGetImageWidth(self.wand_ptr) as uint
 		}
 	}
 	fn image_height(&self) -> uint {
 		unsafe {
-			wand_extern::wand::MagickGetImageHeight(self.wand_ptr) as uint
+			wand_extern::MagickGetImageHeight(self.wand_ptr) as uint
 		}
 	}
 
@@ -124,7 +123,7 @@ pub impl MagickWand {
 
 		unsafe {
 			let buffer_ptr = vec::raw::to_ptr(pixel_buffer);
-			let success = wand_extern::wand::MagickExportImagePixels(
+			let success = wand_extern::MagickExportImagePixels(
 			  self.wand_ptr,
 			  x    as libc::size_t,
 			  y    as libc::size_t,
@@ -185,7 +184,7 @@ pub impl MagickWand {
 
 		unsafe {
 			let rgb_buffer_ptr = vec::raw::to_ptr(rgb_pixel_buffer);
-			return wand_extern::wand::MagickImportImagePixels(
+			return wand_extern::MagickImportImagePixels(
 			  self.wand_ptr,
 			  x    as libc::size_t,
 			  y    as libc::size_t,
@@ -215,22 +214,22 @@ pub impl MagickWand {
 			None     => PixelWand::new()
 		};
 		unsafe {
-			wand_extern::wand::MagickNewImage(
+			wand_extern::MagickNewImage(
 			  self.wand_ptr, width, height, bg.get_ptr())
 		}
 	}
 
 	fn num_images(&self) -> u32 {
-		unsafe { wand_extern::wand::MagickGetNumberImages(self.wand_ptr) }
+		unsafe { wand_extern::MagickGetNumberImages(self.wand_ptr) }
 	}
 	fn image_total_ink_density(&self) -> f64 {
-		unsafe { wand_extern::wand::MagickGetImageTotalInkDensity(self.wand_ptr) }
+		unsafe { wand_extern::MagickGetImageTotalInkDensity(self.wand_ptr) }
 	}
 	fn has_next_image(&self) -> bool {
-		unsafe { wand_extern::wand::MagickHasNextImage(self.wand_ptr) }
+		unsafe { wand_extern::MagickHasNextImage(self.wand_ptr) }
 	}
 	fn has_previous_image(&self) -> bool {
-		unsafe { wand_extern::wand::MagickHasNextImage(self.wand_ptr) }
+		unsafe { wand_extern::MagickHasNextImage(self.wand_ptr) }
 	}
 }
 
@@ -238,7 +237,7 @@ impl Clone for MagickWand {
 	fn clone(&self) -> MagickWand {
 		let new_wand_ptr;
 		unsafe {
-			new_wand_ptr = wand_extern::wand::CloneMagickWand(self.wand_ptr)
+			new_wand_ptr = wand_extern::CloneMagickWand(self.wand_ptr)
 		}
 		MagickWand::new_with_ptr(new_wand_ptr)
 	}
@@ -246,6 +245,6 @@ impl Clone for MagickWand {
 
 impl Drop for MagickWand {
 	fn finalize(&self) {
-		unsafe { wand_extern::wand::DestroyMagickWand(self.wand_ptr); }
+		unsafe { wand_extern::DestroyMagickWand(self.wand_ptr); }
 	}
 }

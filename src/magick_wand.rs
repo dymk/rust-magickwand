@@ -12,5 +12,5 @@ pub mod image;
 pub mod wand_extern;
 
 #[path="../test/test_all.rs"]
-#[test]
+#[cfg(test)]
 mod test_all;
