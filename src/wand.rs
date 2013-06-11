@@ -51,9 +51,9 @@ pub impl MagickWand {
 		}
 	}
 	fn image_blob(&self) -> ~[u8] {
-		let mut len: u32 = 0;
 		unsafe {
-			let blob = wand_extern::MagickGetImageBlob(self.wand_ptr, &len);
+			let mut len: u32 = 0;
+			let blob = wand_extern::MagickGetImageBlob(self.wand_ptr, &mut len);
 			let v: ~[u8] = vec::from_buf(blob as *u8, len as uint);
 			wand_extern::MagickRelinquishMemory(blob);
 			return v;

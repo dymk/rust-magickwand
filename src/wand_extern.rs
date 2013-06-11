@@ -77,7 +77,7 @@ pub extern {
 	  fname: *libc::c_char) -> bool; //Tested
 	fn MagickGetImageBlob(
 	  wand: MagickWandPtr,
-	  length: *libc::size_t) -> *libc::c_void; //Tested
+	  length: *mut libc::size_t) -> *libc::c_void; //Tested
 	fn MagickWriteImage(
 	  wand: MagickWandPtr,
 	  fname: *libc::c_char) -> bool;

@@ -103,7 +103,7 @@ fn test_magick_get_image_blob() {
 		//Test without a blob in the wand
 		let wand = wand_extern::NewMagickWand();
 		let mut len: libc::size_t = 0;
-		let blob = wand_extern::MagickGetImageBlob(wand, &len);
+		let blob = wand_extern::MagickGetImageBlob(wand, &mut len);
 		assert_eq!(len, 0);
 		assert_eq!(blob, ptr::null());
 		wand_extern::DestroyMagickWand(wand);
@@ -114,7 +114,7 @@ fn test_magick_get_image_blob() {
 		let wand = wand_extern::NewMagickWand();
 		wand_extern::MagickReadImageBlob(wand, vec::raw::to_ptr(image_bytes), image_bytes.len() as u32);
 		let mut len: libc::size_t = 0;
-		let blob = wand_extern::MagickGetImageBlob(wand, &len);
+		let blob = wand_extern::MagickGetImageBlob(wand, &mut len);
 		assert!(len != 0);
 		assert!(blob != ptr::null());
 		wand_extern::DestroyMagickWand(wand);
